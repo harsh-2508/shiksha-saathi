@@ -4,7 +4,7 @@ import { BookOpen, Users, Volume2, Clock, CheckCircle, ChevronRight, Loader2 } f
 
 // --- CONFIG ---
 // Change this to your Render URL after deployment
-const API_URL = "http://localhost:4000"; 
+const API_URL = "https://shiksha-saathi-api.onrender.com"; 
 
 // --- COMPONENTS ---
 
