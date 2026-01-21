@@ -50,14 +50,24 @@ app.get('/', (req, res) => {
 app.post('/suggest', async (req, res) => {
   console.log("Suggestion Request:", req.body);
   const { challenge, grade, subject } = req.body;
+  
+  const gradeNum = parseInt(grade);
+  let gradeCategory = 'primary'; 
+  if (gradeNum >= 6) gradeCategory = 'middle';
+  if (gradeNum >= 9) gradeCategory = 'secondary';
 
   // Rule Engine Check
-  const match = strategies.find(s => 
-    s.challenge === challenge && 
-    (s.grade === grade || s.grade === 'primary')
-  );
-  if (match) return res.json(match);
+  // Quick snippet for index.js to pick random match
+const matches = strategies.filter(s => 
+  s.challenge === challenge && (s.grade === grade || s.grade === 'primary')
+);
 
+if (matches.length > 0) {
+  const randomMatch = matches[Math.floor(Math.random() * matches.length)];
+  return res.json(randomMatch);
+}
+
+console.log("--> Consulting Gemini AI (Slow)...");
   // AI Fallback
   if (!genAI) return res.json({ title: "Offline Mode", action: "Think-Pair-Share", why: "AI Unavailable" });
 
@@ -66,7 +76,7 @@ app.post('/suggest', async (req, res) => {
     const prompt = `
       Act as a senior teacher trainer. 
       Problem: Grade ${grade} teacher facing "${challenge}" in ${subject}.
-      Task: One immediate classroom activity (under 30s setup).
+      Task: One immediate classroom activity (under 10s setup).
       Output strictly JSON: { "title": "Strategy Name", "action": "Step-by-step instruction", "why": "One sentence reason" }
     `;
 

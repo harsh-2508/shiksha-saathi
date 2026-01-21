@@ -12,7 +12,7 @@ export default function InstantHelp() {
   const [data, setData] = useState({
     grade: "3",
     subject: "Math",
-    challenge: "",
+    
   });
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -24,33 +24,43 @@ export default function InstantHelp() {
     { id: "time", label: "Short on Time", icon: Clock },
   ];
 
-  const fetchInstantHelp = async (challengeId) => {
+  const fetchInstantHelp = async (selectedChallenge) => {
     setLoading(true);
     try {
       const res = await axios.post(`${API_URL}/suggest`, {
-        ...data,
-        challengeId,
+        grade: data.grade,
+        subject: data.subject,
+        challenge: selectedChallenge
       });
-      setData(res.data);
+      setResult(res.data);
     } catch (e) {
-      alert("Error connecting to ai");
+      console.error(e);
+      alert("Error connecting to AI");
+    } finally {
+      setLoading(false); // Stop loading even if error occurs
     }
   };
 
   if (result) {
     return (
       <div className="bg-white p-6 rounded-xl border-t-4 border-indigo-600 shadow-lg animate-in fade-in">
-        <h3 className="text-2xl font-bold mb-2">{result.title}</h3>
-        <div className="my-4 p-4 bg-indigo-50 rounded-lg text-indigo-900 font-medium text-lg">
+        <h3 className="text-2xl font-bold mb-2 text-indigo-900">{result.title}</h3>
+        
+        <div className="my-4 p-4 bg-indigo-50 rounded-lg text-indigo-900 font-medium text-lg border border-indigo-100">
           {result.action}
         </div>
-        <p className="text-slate-500 italic">"{result.why}"</p>
+        
+        <div className="flex gap-2 items-start text-slate-500 italic">
+          <span className="font-bold not-italic text-indigo-400">Why:</span> 
+          <p>"{result.why}"</p>
+        </div>
+
         <Button
           onClick={() => setResult(null)}
           variant="secondary"
-          className="mt-6"
+          className="mt-6 w-full"
         >
-          Back
+          Ask Another Question
         </Button>
       </div>
     );
